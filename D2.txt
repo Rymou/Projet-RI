@@ -1,0 +1,3 @@
+the footnote. Paragraph number are printed inside brackets on the left
+margin and the numbering restarts at the beginning of every section.
+References to this edition can be made in this way dahmani
