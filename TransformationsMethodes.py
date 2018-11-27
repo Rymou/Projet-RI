@@ -1,35 +1,34 @@
 from string import *
 from math import *
 import os
-
+import collections,re
 
 def fichierInverse():
     k = 1
     N = 4
     freq = {}
-    ListCar = {'.', ',', '!', '?', '"','-','_',':',';'}
+    ListCar = {".", ",", "!", '?', "'"}
     stoplist = open('stopwords_fr.txt', 'r')
     stoplist = stoplist.read()
     stoplist = stoplist.lower()
-    stoplist = stoplist.split(",")
+    stoplist = stoplist.split()
 
     while (k<=N):
-        print("Indexe de fréquences du document",k)
+        #f = open('./DocsFatim/D'+str(k)+'.txt','r')
         f = open('D'+str(k)+'.txt','r')
         t = f.read()
         t = t.lower()
         i=0
         while (i < len(t)):
             if (t[i] in ListCar):
-                t.replace(t[i], " ")
+                t=t.replace(t[i], " ")
             i = i + 1
         a = t.split()
         nb = len(a)
         for w in a:
             if (not w in stoplist and len(w) > 1):
-                if (not (w, k) in freq):
+                if (w, k) not in freq:
                     freq[w, k] = a.count(w)
-                   # print(w,k,freq[w, k])
         k = k + 1
 
         f.close()
@@ -49,29 +48,53 @@ def indexDoc(freq, numDoc):
 
 def indexMot(freq, mot):
     li = {}
+   # print("le mot")
+   # print(mot)
     for (w, d) in freq:
         if (w == mot):
             li[mot,d] = freq[w, d]
-        
-    li=set(li)
     return li
 
 
+def cleanQuery(query):
+    query = query.lower()
+    ListCar = {'.', ',', '!', '?', '"', ':', ';', "'"}
+    stoplist = open('stopwords_fr.txt', 'r')
+    stoplist = stoplist.read()
+    stoplist = stoplist.lower()
+    stoplist = stoplist.split()
+    import re
+    a = re.split('\s+',query)
+    i = 0
+    while i < len(query):
+        if query[i] in ListCar:
+            query = query.replace(query[i], " ")
+        i += 1
+
+    f =""
+    for w in a:
+        if w not in stoplist and len(w) > 1:
+            if w not in f:
+                f=f+" "+w
+
+    li=f.split()
+    f=" ".join(li)
+    return f
 def myMax(freq):
     maxi = {}
     for (w, d) in freq:
-        if (w not in maxi):
-            maxi[w] = freq[w, d]
+        if not d in maxi:
+            maxi[d] = freq[w, d]
         else:
-            if (maxi[w] < freq[w, d]):
-                maxi[w] = freq[w, d]
+            if (maxi[d] < freq[w, d]):
+                maxi[d] = freq[w, d]
     return maxi
 
 
 def ni(freq):
     ni = {}
     for (w1, d1) in freq:
-        if (w1 not in ni):
+        if w1 not in ni:
             ni[w1] = 1
         else:
             ni[w1] += 1
@@ -80,15 +103,17 @@ def ni(freq):
 def N():
     return 4
 
-#Retourne un dictionnaire contenant (terme, numéroDuFichier):poids
+#Retourne un dictionnaire contenant (terme, numeroDuFichier):poids
 def tfIdf(freq):
     poids = {}
     for (w, d) in freq:
-        poids[w, d] = (freq[w, d] / myMax(freq)[w]) * log10((N() / ni(freq)[w]) + 1)
+        poids[w,d] = (float(freq[w,d]) / float(myMax(freq)[d])) * log10(float(N()) / float(ni(freq)[w]) + 1)
+    
+    
     return poids
 
 
-print("**************************ponderation TF*IDF*************************")
+#print("**************************ponderation TF*IDF*************************")
 
 
 def poidFichier(numDoc,poids):
@@ -108,5 +133,4 @@ def poidWord(word,poids):
     return liste
 
 
-requete = "hiba and ryma or dahmani"
-listR = requete.split()
+

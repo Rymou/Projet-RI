@@ -10,6 +10,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 #from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+
 #from PyQt5.QtWidgets import QWidget
 #import UserInterface
 import os
@@ -17,7 +18,7 @@ import sys
 import TransformationsMethodes as trM 
 import ModeleBooleen as mb
 import ModeleVectoriel as mv
-
+import ModeleProbabiliste as mp
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -41,6 +42,7 @@ class Ui_MainWindow(object):
         self.ListRTerme.setObjectName("ListRTerme")
         self.OTEditOuvrirDocument = QtWidgets.QTextEdit(self.tab)
         self.OTEditOuvrirDocument.setGeometry(QtCore.QRect(310, 30, 431, 41))
+        self.OTEditOuvrirDocument.setReadOnly(True)
         self.OTEditOuvrirDocument.setObjectName("OTEditOuvrirDocument")
         self.BOuvrirDoc = QtWidgets.QPushButton(self.tab)
         self.BOuvrirDoc.setGeometry(QtCore.QRect(670, 90, 75, 31))
@@ -73,7 +75,6 @@ class Ui_MainWindow(object):
         self.ComboBMV = QtWidgets.QComboBox(self.tab_2)
         self.ComboBMV.setGeometry(QtCore.QRect(508, 30, 151, 31))
         self.ComboBMV.setObjectName("ComboBMV")
-        self.ComboBMV.addItems(["","Produit Interne", "Coef de Dice", "Cosinus", "Jaccard"])
         self.label_2 = QtWidgets.QLabel(self.tab_2)
         self.label_2.setGeometry(QtCore.QRect(380, 30, 101, 21))
         self.label_2.setObjectName("label_2")
@@ -83,63 +84,141 @@ class Ui_MainWindow(object):
         self.BEnvoyerMV = QtWidgets.QPushButton(self.tab_2)
         self.BEnvoyerMV.setGeometry(QtCore.QRect(590, 200, 75, 23))
         self.BEnvoyerMV.setObjectName("BEnvoyerMV")
-        self.BEnvoyerMV.clicked.connect(self.evalVectoriel)
         self.ListeResu = QtWidgets.QListView(self.tab_2)
         self.ListeResu.setGeometry(QtCore.QRect(90, 240, 571, 241))
         self.ListeResu.setObjectName("ListeResu")
-        self.label_4 = QtWidgets.QLabel(self.tab_2)
-        self.label_4.setGeometry(QtCore.QRect(30, 30, 101, 21))
-        self.label_4.setObjectName("label_4")
-        self.ComboBMV_2 = QtWidgets.QComboBox(self.tab_2)
-        self.ComboBMV_2.setGeometry(QtCore.QRect(150, 30, 151, 31))
-        self.ComboBMV_2.setObjectName("ComboBMV_2")
-        self.ComboBMV_2.addItems(["","1", "2", "3", "4"])
         self.ListViewMV.addTab(self.tab_2, "")
         self.tab_4 = QtWidgets.QWidget()
         self.tab_4.setObjectName("tab_4")
+        self.RequeteEntry = QtWidgets.QTextEdit(self.tab_4)
+        self.RequeteEntry.setGeometry(QtCore.QRect(140, 110, 521, 51))
+        self.RequeteEntry.setObjectName("RequeteEntry")
+        self.Bvect = QtWidgets.QPushButton(self.tab_4)
+        self.Bvect.setGeometry(QtCore.QRect(490, 410, 101, 23))
+        self.Bvect.setObjectName("Bvect")
+        self.vectCombo = QtWidgets.QComboBox(self.tab_4)
+        self.vectCombo.setGeometry(QtCore.QRect(490, 380, 101, 22))
+        self.vectCombo.setObjectName("vectCombo")
+        self.Bproba = QtWidgets.QPushButton(self.tab_4)
+        self.Bproba.setGeometry(QtCore.QRect(210, 390, 101, 23))
+        self.Bproba.setObjectName("Bproba")
+        self.probaList = QtWidgets.QListView(self.tab_4)
+        self.probaList.setGeometry(QtCore.QRect(140, 180, 241, 192))
+        self.probaList.setObjectName("probaList")
+        self.vectorList = QtWidgets.QListView(self.tab_4)
+        self.vectorList.setGeometry(QtCore.QRect(420, 180, 241, 192))
+        self.vectorList.setObjectName("vectorList")
+        self.verticalLayoutWidget = QtWidgets.QWidget(self.tab_4)
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(20, 190, 101, 141))
+        self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.checkDoc1 = QtWidgets.QCheckBox(self.verticalLayoutWidget)
+        self.checkDoc1.setObjectName("checkDoc1")
+        self.verticalLayout.addWidget(self.checkDoc1)
+        self.checkDoc2 = QtWidgets.QCheckBox(self.verticalLayoutWidget)
+        self.checkDoc2.setObjectName("checkDoc2")
+        self.verticalLayout.addWidget(self.checkDoc2)
+        self.checkDoc3 = QtWidgets.QCheckBox(self.verticalLayoutWidget)
+        self.checkDoc3.setObjectName("checkDoc3")
+        self.verticalLayout.addWidget(self.checkDoc3)
+        self.checkDoc4 = QtWidgets.QCheckBox(self.verticalLayoutWidget)
+        self.checkDoc4.setObjectName("checkDoc4")
+        self.verticalLayout.addWidget(self.checkDoc4)
+        self.choisirDoc = QtWidgets.QLabel(self.tab_4)
+        self.choisirDoc.setGeometry(QtCore.QRect(20, 140, 101, 31))
+        self.choisirDoc.setObjectName("choisirDoc")
+        self.LabRequete = QtWidgets.QLabel(self.tab_4)
+        self.LabRequete.setGeometry(QtCore.QRect(360, 80, 51, 20))
+        self.LabRequete.setObjectName("LabRequete")
         self.ListViewMV.addTab(self.tab_4, "")
-        self.BOkDemarrer.clicked.connect(self.get_term)
         self.gridLayout.addWidget(self.ListViewMV, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
+        self.BEnvoyerMV.clicked.connect(self.evalVectoriel)
+        self.BOkDemarrer.clicked.connect(self.get_term)
+        self.ComboBMV.addItems(["", "Produit Interne", "Coef de Dice", "Cosinus", "Jaccard"])
+        self.vectCombo.addItems(["", "Produit Interne", "Coef de Dice", "Cosinus", "Jaccard"])
         self.BOuvrirDoc.clicked.connect(self.openFile)
         self.BEnvoyerReqB.clicked.connect(self.evalBoolean)
+        self.Bvect.clicked.connect(self.evalVectoriel2)
+        self.Bproba.clicked.connect(self.evalProba)
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
         self.ListViewMV.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
+    def evalProba(self):
+        listDocs=[]
+        checkBoxList = self.verticalLayoutWidget.findChildren(QtWidgets.QCheckBox)
+        #print(checkBoxList)
+        for loop in range(len(checkBoxList)):
+                if checkBoxList[loop].isChecked():
+                    #listDocs.append(checkBoxList[loop])
+                    listDocs.append(int(checkBoxList[loop].text()[len(checkBoxList[loop].text())-1]))
+        requete = self.RequeteEntry.toPlainText()
+        requete = trM.cleanQuery(requete)
+        res = mp.modeleProbabiliste(requete,listDocs)
+        model = QtGui.QStandardItemModel()
+        self.probaList.setModel(model)
+        print("here")
+        for (k,v) in res.items():
+            print("key"+str(k)+" value "+str(v))
+            StringSim = "Document "+str(k)+" == "+str(v)
+            simDocQ = QtGui.QStandardItem(StringSim)
+            model.appendRow(simDocQ)
     def evalVectoriel(self):
         requete = self.TEditReqMV.toPlainText()
+        requete = trM.cleanQuery(requete)
         formule = self.ComboBMV.currentText()
-        numDoc = self.ComboBMV_2.currentText()
-        sim = mv.ModeleVectoriel(requete,int(numDoc),formule)
         model = QtGui.QStandardItemModel()
         self.ListeResu.setModel(model)
-        StringSim = "Resultat pour la formule : "+formule+" dans le document "+str(numDoc)+" == "+str(sim)
-        simDocQ = QtGui.QStandardItem(StringSim)
-        model.appendRow(simDocQ)
-        print("finitooooooooooo et sim == ", sim)
+        for doc in range(1,trM.N()+1):
+            sim = mv.ModeleVectoriel(requete,doc,formule)
+            StringSim = "Resultat pour la formule : "+formule+" dans le document "+str(doc)+" == "+str(sim)
+            simDocQ = QtGui.QStandardItem(StringSim)
+            model.appendRow(simDocQ)
+    def evalVectoriel2(self):
+        requete = self.RequeteEntry.toPlainText()
+        requete = trM.cleanQuery(requete)
+        formule = self.vectCombo.currentText()
+        model = QtGui.QStandardItemModel()
+        self.vectorList.setModel(model)
+        for doc in range(1,trM.N()+1):
+            sim = mv.ModeleVectoriel(requete,doc,formule)
+            StringSim = "Document "+str(doc)+" == "+str(sim)
+            simDocQ = QtGui.QStandardItem(StringSim)
+            model.appendRow(simDocQ)
 
 
 
 
     def evalBoolean(self):
         string = self.tEditReqB.toPlainText()
+        string = trM.cleanQuery(string)
         lis = mb.ModelBooleen(string)
         model = QtGui.QStandardItemModel()
         self.ListeViewMB.setModel(model)
-        for k in lis:
-            resultat = "Requete satisfaite dans le document :  "+str(k)
+        if len(lis)==0:
+            resultat = "Aucun document ne satisfait la requete"
             item = QtGui.QStandardItem(resultat)
             model.appendRow(item)
+        else:
+            for k in lis:
+                resultat = "Requete satisfaite dans le document :  "+str(k)
+                item = QtGui.QStandardItem(resultat)
+                model.appendRow(item)
 
     def get_term(self):
         term=self.TEditTerme.toPlainText()
         fichierInverse = trM.fichierInverse()
+        print(fichierInverse)
+        poid=trM.tfIdf(fichierInverse)
+        term = trM.cleanQuery(term)
         li = trM.indexMot(fichierInverse,term)
+        print(li)
         model = QtGui.QStandardItemModel()
         self.ListRTerme.setModel(model)
         if(len(li)==0):
@@ -147,7 +226,7 @@ class Ui_MainWindow(object):
             model.appendRow(item)
         else:
             for k ,v in li:
-                item = QtGui.QStandardItem("Le terme : "+term+" apparait dans le fichier : "+str(v))
+                item = QtGui.QStandardItem("Doc :"+str(v)+" poid :"+str(poid[k,v]))
                 model.appendRow(item)
 
         
@@ -171,15 +250,13 @@ class Ui_MainWindow(object):
                 #print(tf)
                 numDoc=int(fichier[1])
                 li = trM.indexDoc(fichierInverse,numDoc)
-                print("liiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
-                print(li)
                 model = QtGui.QStandardItemModel()
                 self.ListeRDoc.setModel(model)
                 document = "************** Document "+str(numDoc)+" **************"
                 item = QtGui.QStandardItem(document)
                 model.appendRow(item)
                 for k ,v in li.items():
-                    it = k+ " , "+str(v)+" : "+str(tf[k,numDoc])
+                    it = k+ " : "+str(tf[k,numDoc])
                     #it = k+" : "+str(v)+" ==> poids : " + str(tf[k,numDoc])
                     item = QtGui.QStandardItem(it)
                     model.appendRow(item)
@@ -197,9 +274,17 @@ class Ui_MainWindow(object):
         self.label_2.setText(_translate("MainWindow", "Choix de la formule"))
         self.label_3.setText(_translate("MainWindow", "Requete"))
         self.BEnvoyerMV.setText(_translate("MainWindow", "Envoyer"))
-        self.label_4.setText(_translate("MainWindow", "Choix du document"))
         self.ListViewMV.setTabText(self.ListViewMV.indexOf(self.tab_2), _translate("MainWindow", "Modele Vectoriel"))
+        self.Bvect.setText(_translate("MainWindow", "Vectorial Score"))
+        self.Bproba.setText(_translate("MainWindow", "Probabilistic Score"))
+        self.checkDoc1.setText(_translate("MainWindow", "Doc 1"))
+        self.checkDoc2.setText(_translate("MainWindow", "Doc 2"))
+        self.checkDoc3.setText(_translate("MainWindow", "Doc 3"))
+        self.checkDoc4.setText(_translate("MainWindow", "Doc 4"))
+        self.choisirDoc.setText(_translate("MainWindow", "choisir un document"))
+        self.LabRequete.setText(_translate("MainWindow", "REQUETE"))
         self.ListViewMV.setTabText(self.ListViewMV.indexOf(self.tab_4), _translate("MainWindow", "Modele Probabiliste"))
+
 
 if __name__ == "__main__":
     import sys

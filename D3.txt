@@ -1,4 +1,2 @@
-To this third Edition, however, I have made several additions,
-particularly to the chapter upon Drawbacks, and to that upon Bounties;
-likewise a new chapter entitled, The Conclusion of the Mercantile System;
-and a new article to the chapter upon the expences of
+un modèle de recherche d'information est composé de trois modules, module de représentation des documents,
+ module de représentation de requête, module d'appariement entre document et requête

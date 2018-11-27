@@ -6,7 +6,6 @@ import TransformationsMethodes as trM
 def requestTransform(requete, docNumber):
     fichierInverse = trM.fichierInverse()
     re = requete.split(" ")
-    print(re)
     newRequest = []
     for (k, v) in fichierInverse.items():
         if (k[1] == docNumber):
@@ -16,16 +15,11 @@ def requestTransform(requete, docNumber):
                 newRequest.append(0)
         else:
             newRequest.append(0)
-    print(fichierInverse)
-    print(len(newRequest))
-    print(len(fichierInverse))
-    print(newRequest)
     return newRequest
 
 
 def QueryVector():
     fichierInverse = trM.fichierInverse()
-    #listq=requete.split(" ")
     motUnique=[]
     vector={}
     vectors=[]
@@ -44,15 +38,7 @@ def QueryVector():
                 vector[word]=poidsDoc[word]
             else:
                 vector[word]=0
-        #print("this is vector"+str(i))
-
-        #print(vector)
         vectors.append(vector)
-    #print(motUnique)
-    #print(len(motUnique))
-    #print("Poiiiiiiiiids doooooooc")
-    #print(len(vectors[1]))
-    #print(vectors[1])
     return vectors
 
 def transformationRequete(requete):
@@ -67,16 +53,9 @@ def transformationRequete(requete):
     return requeteTransformee
 
 def ModeleVectoriel(requete, numDoc,formule):
-    #fichierInverse = trM.fichierInverse()
     requteL=requete.split(" ")
     requeteTransformee = transformationRequete(requete)
-    print("Requeeeeete == ")
-    print(requeteTransformee)
-
     vector=QueryVector()[numDoc-1]
-    print("Vectooooooor du document1 == ")
-    print(vector)
-
     q=[]
     for word in vector:
         if(word in requteL):
@@ -86,49 +65,64 @@ def ModeleVectoriel(requete, numDoc,formule):
 
     sim = 0
     i = 0
-
+    poids=trM.tfIdf(trM.fichierInverse())
     if(formule == 'Produit Interne'):
-        for k, v in vector.items():
-            sim = sim + (v * requeteTransformee[k])
-            i = i + 1
-        #print("Le produit interne == ", sim)
-
+        sim = 0
+        for word in requteL:
+           for k, v in poids:
+                if word==k and v==numDoc:
+                    sim = sim + poids[k,v]
     if(formule=="Coef de Dice"):
+        sim = 0
         simR=0
         simF=0
-        for k, v in vector.items():
-            sim = sim + (v * requeteTransformee[k])
-            simR = simR + requeteTransformee[k] * requeteTransformee[k]
-            simF = simF + v * v
+        simF=len(requteL)
+        for k, v in poids:
+            if k in requteL and v==numDoc:
+                sim = sim + poids[k,v]
+                simF = simF + pow(poids[k,v],2)
+            elif v==numDoc:
+                simF = simF + pow(poids[k, v], 2)
             i = i + 1
-        sim = (sim*2) / (simR+simF)
-        #print("Le Coef de Dice == ", sim)
-
+        if simF==0:
+            sim = 0
+        else:
+            sim = (sim*2) / (simF)
     if(formule=="Cosinus"):
+        sim = 0
         simR = 0
-        simF = 0
+        simF = len(requteL)
 
-        for k, v in vector.items():
-            print(i)
-            sim = sim + (v * requeteTransformee[k])
-            simR = simR + requeteTransformee[k] * requeteTransformee[k]
-            simF = simF + v * v
-            i = i + 1
-        sim = sim  / sqrt(simR + simF)
-        #print("Le Cosinus == ",sim)
-
+        for k, v in poids:
+            if k in requteL and v==numDoc:
+                sim = sim + poids[k,v]
+                simR = simR + pow(poids[k,v],2)
+           # elif v==numDoc:
+               # simR = simR + pow(poids[k, v], 2)
+        if(simR*simF==0):
+            sim=0
+        else:
+            sim = sim  / sqrt(simR * simF)
     if(formule=='Jaccard'):
+        sim = 0
         simR = 0
-        simF = 0
-
-        for k, v in vector.items():
-            sim = sim + (v * requeteTransformee[k])
-            simR = simR + requeteTransformee[k] * requeteTransformee[k]
-            simF = simF + v * v
-            i = i + 1
-        sim = sim / ((simR + simF)-sim)
-        #print("Jaccad == ",sim)
+        simF = len(requteL)
+        for k, v in poids:
+            if k in requteL and v==numDoc:
+                print("the k : "+k+"  the v : "+str(v))
+                sim = sim + poids[k,v]
+                print("sim :"+str(sim))
+                simR = simR + pow(poids[k,v],2)
+                print("simR : "+str(simR))
+            elif v==numDoc:
+                simR = simR + pow(poids[k, v], 2)
+        print("mul"+ str(simR*simF))
+        numerateur = simR + simF - sim
+        if(numerateur==0):
+            numerateur=0
+        else:
+            sim = sim / numerateur
     return sim
         
-print("Resultaaaaaaaaaaaat")
-print(ModeleVectoriel('hiba of ryma',1,'Coef de Dice'))
+
+print(ModeleVectoriel('information recherche module',1,'Jaccard'))
